@@ -24,7 +24,7 @@ class SpotifyClientTest {
 
 
     @Test
-    fun shouldRetrieveArtistFromSpotify() {
+    fun shouldRetrieveArtistFromSpotify_ignoringCase() {
         wireMockRule.addStubMapping(StubMapping(
                 newRequestPattern(RequestMethod.GET, WireMock.urlPathEqualTo("/v1/search"))
                         .withQueryParam("q", WireMock.equalTo("The National"))
@@ -35,7 +35,7 @@ class SpotifyClientTest {
         val spotify = SpotifyClientImpl(searchHost)
 
         val (name, popularity) = spotify.searchArtist("The National")!!
-        assertThat(name, equalTo("The National"))
+        assertThat(name, equalTo("The national"))
         assertThat(popularity, equalTo(69))
     }
 

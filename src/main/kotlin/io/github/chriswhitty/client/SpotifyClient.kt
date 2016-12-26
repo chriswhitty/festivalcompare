@@ -33,7 +33,7 @@ class SpotifyClientImpl(val spotifyHost: String) : SpotifyClient {
         val wrapper = objectMapper.readValue(response.body().byteStream(), WrapperDto::class.java)
 
         val found = wrapper.artists.items.firstOrNull { artist ->
-            artist.name.equals(name)
+            artist.name.toLowerCase().equals(name.toLowerCase())
         }
 
         found ?: return null
