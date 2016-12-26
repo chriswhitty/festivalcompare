@@ -40,6 +40,21 @@ class SpotifyClientTest {
     }
 
     @Test
+    fun shouldReturnNull_whenApiRequestFails() {
+        wireMockRule.addStubMapping(StubMapping(
+                newRequestPattern(RequestMethod.GET, WireMock.urlPathEqualTo("/v1/search"))
+                        .withQueryParam("q", WireMock.equalTo("Too Many Requests"))
+                        .withQueryParam("type", WireMock.equalTo("artist"))
+                        .build(),
+                ResponseDefinition(492, file("/spotify_artist_search_rate_limit.json"))))
+
+        val spotify = SpotifyClientImpl(searchHost)
+
+        val artist = spotify.searchArtist("Too Many Requests")
+        assertThat(artist, nullValue())
+    }
+
+    @Test
     fun shouldReturnNull_whenNoArtistFound() {
         wireMockRule.addStubMapping(StubMapping(
                 newRequestPattern(RequestMethod.GET, WireMock.urlPathEqualTo("/v1/search"))

@@ -25,6 +25,10 @@ class SpotifyClientImpl(val spotifyHost: String) : SpotifyClient {
                 .build()
 
         val response = okHttpClient.newCall(request).execute()
+        if (!response.isSuccessful) {
+            print(response.body().string())
+            return null
+        }
 
         val objectMapper = ObjectMapper()
                 .registerKotlinModule()
