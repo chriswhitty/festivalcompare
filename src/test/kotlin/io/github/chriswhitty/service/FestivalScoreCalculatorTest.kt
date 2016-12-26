@@ -1,5 +1,7 @@
 package io.github.chriswhitty.service
 
+import org.hamcrest.Matchers
+import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -21,39 +23,43 @@ class FestivalScoreCalculatorTest {
 
         val calculator = FestivalScoreCalculatorImpl(scoreCalculator)
 
-        val score = calculator.calculate(festival)
-        assertThat(score, equalTo(60))
+        val scoreResult = calculator.calculate(festival)
+        assertThat(scoreResult.score, equalTo(60))
     }
 
     @Test
-    fun shouldExcludeArtists_whenTheyWereNotFound() {
+    fun shouldExcludeAndReportArtists_whenTheyWereNotFound() {
         val scoreCalculator = BandScores(mapOf(
                 "The National" to 70
         ))
 
+        val missingBand = Artist("FakeBand")
         val festival = Festival(listOf(
                 Artist("The National"),
-                Artist("FakeBand")
+                missingBand
         ))
 
         val calculator = FestivalScoreCalculatorImpl(scoreCalculator)
 
-        val score = calculator.calculate(festival)
+        val (score, missing) = calculator.calculate(festival)
         assertThat(score, equalTo(70))
+        assertThat(missing, contains(missingBand))
     }
 
     @Test
     fun shouldReturn0_whenNoArtistsMatched() {
         val scoreCalculator = BandScores(mapOf())
 
+        val missingBand = Artist("FakeBand")
         val festival = Festival(listOf(
-                Artist("FakeBand")
+                missingBand
         ))
 
         val calculator = FestivalScoreCalculatorImpl(scoreCalculator)
 
-        val score = calculator.calculate(festival)
+        val (score, missing) = calculator.calculate(festival)
         assertThat(score, equalTo(0))
+        assertThat(missing, contains(missingBand))
     }
 
     class BandScores(val scores: Map<String, Int>): ArtistScoreCalculator {

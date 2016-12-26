@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping
     @PostMapping("/") fun handlePostFestivalForm(@ModelAttribute form: FestivalFormDto, model: Model): String {
 
         val artists = form.artists.split("\n").map { Artist(it.trim()) }
-        val score = festivalScoreCalculator.calculate(Festival(artists))
+        val scoreResult = festivalScoreCalculator.calculate(Festival(artists))
 
-        model.addAttribute("score", score)
+        model.addAttribute("score", scoreResult.score)
+        model.addAttribute("notFound", scoreResult.notFound)
         return "festivalResult"
     }
 

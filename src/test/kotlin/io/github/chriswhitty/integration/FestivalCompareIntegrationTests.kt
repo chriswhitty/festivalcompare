@@ -3,8 +3,8 @@ package io.github.chriswhitty.integration
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.hamcrest.Matchers.containsString
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers
+import org.hamcrest.Matchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,9 +23,11 @@ class FestivalCompareIntegrationTests {
 
     @Test
     fun returnsScore_whenPostingFestival() {
+        val nonExistingBand = "sdohaosdfhashduahfhad"
+
         val formBody = FormBody.Builder()
                 .add("name", "Festival")
-                .add("artists", "The National\nNirvana")
+                .add("artists", "The National\nNirvana\n$nonExistingBand")
                 .build()
 
         val request = Request.Builder()
@@ -35,8 +37,18 @@ class FestivalCompareIntegrationTests {
 
         val response = okHttpClient.newCall(request).execute()
         assertThat(response.isSuccessful, equalTo(true))
-        assertThat(response.body().string(), containsString("Average score: <span>74</span>"))
+        val responseBody = response.body().string()
+
+        val matchResult = "Average score: <span>(\\d+)</span>".toRegex().find(responseBody, 0)
+        assertThat("Could not find score in page", matchResult, notNullValue())
+        assertThat(Integer.parseInt(matchResult?.groupValues?.get(1)), allOf(greaterThan(50), lessThan(100)))
+        assertThat(responseBody, Matchers.containsString("""
+            |    <ul>
+            |        <li>$nonExistingBand</li>
+            |    </ul>""".trimMargin()))
     }
 
-    //TODO report mismatches
+    //TODO Handle empty rows
+    //TODO artist name match should be case insensitive
 }
+
