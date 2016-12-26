@@ -48,7 +48,6 @@ class FestivalCompareIntegrationTests {
             |    </ul>""".trimMargin()))
     }
 
-    //TODO Handle empty rows
     //TODO artist name match should be case insensitive
 }
 

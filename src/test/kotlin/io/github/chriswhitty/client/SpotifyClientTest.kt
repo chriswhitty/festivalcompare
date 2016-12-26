@@ -34,9 +34,9 @@ class SpotifyClientTest {
 
         val spotify = SpotifyClientImpl(searchHost)
 
-        val artist = spotify.searchArtist("The National")!!
-        assertThat(artist.name, equalTo("The National"))
-        assertThat(artist.popularity, equalTo(69))
+        val (name, popularity) = spotify.searchArtist("The National")!!
+        assertThat(name, equalTo("The National"))
+        assertThat(popularity, equalTo(69))
     }
 
     @Test
