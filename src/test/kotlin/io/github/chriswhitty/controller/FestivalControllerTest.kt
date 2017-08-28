@@ -1,6 +1,7 @@
 package io.github.chriswhitty.service
 
 import com.nhaarman.mockito_kotlin.any
+import io.github.chriswhitty.client.SpotifyClient
 import io.github.chriswhitty.controller.FestivalController
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,11 +26,12 @@ class FestivalControllerTest {
     lateinit var mockMvc: MockMvc
 
     @MockBean lateinit var festivalScoreCalculator: FestivalScoreCalculator
+    @MockBean lateinit var spotifyClient: SpotifyClient
 
     @Test
     fun postForm_shouldAddFestivalScoreToModel() {
 
-        var missingBand = Artist("Missing Band")
+        val missingBand = Artist("Missing Band")
         `when`(festivalScoreCalculator.calculate(
                 Festival(listOf(
                         Artist("The National"),
