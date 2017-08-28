@@ -3,6 +3,7 @@ package io.github.chriswhitty.client
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.springframework.stereotype.Component
@@ -13,18 +14,28 @@ interface SpotifyClient {
     fun searchArtist(name: String): Artist?
 }
 
-@Component
-class SpotifyClientImpl(val spotifyHost: String) : SpotifyClient {
+class RatelimitExceededException : Exception()
 
-    val okHttpClient = OkHttpClient()
+class SpotifyClientImpl(
+        val apiEndpoint: String,
+        oauthInterceptor: Interceptor) : SpotifyClient {
+
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(oauthInterceptor)
+        .build()
 
     override fun searchArtist(name: String): Artist? {
 
         val request = Request.Builder()
-                .url("$spotifyHost/v1/search?q=$name&type=artist")
+                .url("$apiEndpoint/v1/search?q=$name&type=artist")
                 .build()
 
         val response = okHttpClient.newCall(request).execute()
+        if(response.code() == 492) {
+            throw RatelimitExceededException()
+        }
+
         if (!response.isSuccessful) {
             print(response.body().string())
             return null
@@ -34,14 +45,16 @@ class SpotifyClientImpl(val spotifyHost: String) : SpotifyClient {
                 .registerKotlinModule()
                 .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-        val wrapper = objectMapper.readValue(response.body().byteStream(), WrapperDto::class.java)
+        response.body().byteStream().use { responseStream ->
+            val wrapper = objectMapper.readValue(responseStream, WrapperDto::class.java)
 
-        val found = wrapper.artists.items.firstOrNull { artist ->
-            artist.name.toLowerCase().equals(name.toLowerCase())
+            val found = wrapper.artists.items.firstOrNull { artist ->
+                artist.name.toLowerCase() == name.toLowerCase()
+            }
+
+            found ?: return null
+            return Artist(found.name, found.popularity)
         }
-
-        found ?: return null
-        return Artist(found.name, found.popularity)
     }
 
     private data class WrapperDto(val artists: ArtistsDto)

@@ -1,0 +1,5 @@
+spring.thymeleaf.cache: false
+
+spotify:
+  apiEndpoint: https://api.spotify.com
+  authenticationEndpoint: https://accounts.spotify.com/api/token

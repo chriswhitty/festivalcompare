@@ -1,5 +1,7 @@
 package io.github.chriswhitty.service
 
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.whenever
 import io.github.chriswhitty.client.Artist
 import io.github.chriswhitty.client.SpotifyClient
 import org.hamcrest.Matchers.equalTo
@@ -7,8 +9,6 @@ import org.hamcrest.Matchers.nullValue
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
 
 
 class SpotifyScoreCalculatorTest {
@@ -17,19 +17,19 @@ class SpotifyScoreCalculatorTest {
 
     @Before
     fun setUp() {
-        mockSpotifyClient = Mockito.mock(SpotifyClient::class.java)
+        mockSpotifyClient = mock<SpotifyClient>()
         calculator = SpotifyArtistScoreCalculator(mockSpotifyClient)
     }
 
     @Test
     fun shouldRetrievePopularityFromSpotify() {
-        `when`(mockSpotifyClient.searchArtist("The National")).thenReturn(Artist("The National", 90))
+        whenever(mockSpotifyClient.searchArtist("The National")).thenReturn(Artist("The National", 90))
         assertThat(calculator.calculate(Artist("The National")), equalTo(90))
     }
 
     @Test
     fun shouldReturnNull_whenNoArtistFound() {
-        `when`(mockSpotifyClient.searchArtist("FakeBand")).thenReturn(null)
+        whenever(mockSpotifyClient.searchArtist("FakeBand")).thenReturn(null)
         assertThat(calculator.calculate(Artist("FakeBand")), nullValue())
     }
 }
