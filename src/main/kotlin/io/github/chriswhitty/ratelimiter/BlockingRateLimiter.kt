@@ -1,7 +1,6 @@
 package io.github.chriswhitty.ratelimiter
 
 import io.github.chriswhitty.clock.Clock
-import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.Instant
 
@@ -18,7 +17,7 @@ class BlockingRateLimiter(
     override fun <R : Any?, T : () -> R> start(callable: T): R {
         val canCallAfter = lastCall + requestLimit
         while (clock.now().isBefore(canCallAfter)) {
-            Thread.sleep(100)
+            Thread.sleep(50)
         }
         lastCall = clock.now()
 

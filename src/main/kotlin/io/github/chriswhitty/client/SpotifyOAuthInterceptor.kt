@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import okhttp3.*
+import org.slf4j.LoggerFactory
 import java.util.*
 
 
-data class SpotifyAuthResponse (
+data class SpotifyAuthResponse(
         var access_token: String,
         var token_type: String,
         var expires_in: String
@@ -19,6 +20,8 @@ open class SpotifyOAuthInterceptor(
         private val clientSecret: String,
         private val client: OkHttpClient = OkHttpClient.Builder().build()) : Interceptor {
 
+    private val logger = LoggerFactory.getLogger(SpotifyOAuthInterceptor::class.java)
+
     private var authResponse: SpotifyAuthResponse? = null
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -26,8 +29,8 @@ open class SpotifyOAuthInterceptor(
 
         val response = chain.proceed(addAuthHeader(request))
 
-        if(response.code() == 401) {
-             authResponse = updateClientGrantAuthToken()
+        if (response.code() == 401) {
+            authResponse = updateClientGrantAuthToken()
         }
 
         return chain.proceed(addAuthHeader(request))
@@ -42,6 +45,7 @@ open class SpotifyOAuthInterceptor(
 
     private fun updateClientGrantAuthToken(): SpotifyAuthResponse {
         synchronized(client) {
+            logger.info("Updating Spotify client auth token")
 
             val authHeader = Base64.getEncoder().encodeToString("$clientId:$clientSecret".toByteArray())
             val formBody = FormBody.Builder()
