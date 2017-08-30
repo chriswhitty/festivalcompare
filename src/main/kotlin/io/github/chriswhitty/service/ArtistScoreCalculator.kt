@@ -5,14 +5,17 @@ import org.springframework.stereotype.Service
 
 
 interface ArtistScoreCalculator {
-    fun calculate(band: Artist): Int?
+    val type: String
+    fun calculate(name: String): Int?
 }
 
 @Service
 class SpotifyArtistScoreCalculator(val spotifyClient: SpotifyClient) : ArtistScoreCalculator {
 
-    override fun calculate(band: Artist): Int? {
-        val artist = spotifyClient.searchArtist(band.name)
+    override val type = "Spotify"
+
+    override fun calculate(name: String): Int? {
+        val artist = spotifyClient.searchArtist(name)
 
         artist ?: return null
         return artist.popularity

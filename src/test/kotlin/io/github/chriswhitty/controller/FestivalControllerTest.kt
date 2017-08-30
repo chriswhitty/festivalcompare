@@ -25,37 +25,50 @@ class FestivalControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
-    @MockBean lateinit var festivalScoreCalculator: FestivalScoreCalculator
+    @MockBean lateinit var eventService: EventService
     @MockBean lateinit var spotifyClient: SpotifyClient
 
     @Test
     fun postForm_shouldAddFestivalScoreToModel() {
 
-        val missingBand = Artist("Missing Band")
-        `when`(festivalScoreCalculator.calculate(
-                Festival(listOf(
-                        Artist("The National"),
-                        Artist("The Smiths"),
-                        missingBand
-                        ))))
-            .thenReturn(ScoreResult(88, listOf(missingBand)))
+        val missingBand = "Missing Band"
+
+        `when`(eventService.calculate("festival name",
+                listOf("The National", "The Smiths", "Missing Band")))
+                .thenReturn(Event("festival name", 88.0, listOf(
+                        Artist("The National", listOf(
+                                Score("Spotify", 90)
+                        )),
+                        Artist("The Smiths", listOf(
+                                Score("Spotify", 80)
+                        )),
+                        Artist("Missing Band", listOf())
+                )))
 
         val request = post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("name", "festival name")
-                .param("artists", "The National\r\nThe Smiths\r\n${missingBand.name}")
+                .param("artists", "The National\r\nThe Smiths\r\n${missingBand}")
 
         mockMvc.perform(request)
                 .andExpect(status().isOk)
                 .andExpect(model().attribute("score", 88))
-                .andExpect(model().attribute("notFound", listOf(missingBand)))
+                .andExpect(model().attribute("notFound", listOf(Artist(name = missingBand, scores = listOf()))))
     }
 
     @Test
     fun postForm_shouldExcludeEmptyLines() {
 
-        `when`(festivalScoreCalculator.calculate(any()))
-                .thenReturn(ScoreResult(88, listOf()))
+        val expectedEvent = Event("festival name", 85.0, listOf(
+                Artist("The National", listOf(
+                        Score("Spotify", 90)
+                )),
+                Artist("The Smiths", listOf(
+                        Score("Spotify", 80)
+                ))))
+
+        `when`(eventService.calculate(any(), any()))
+                .thenReturn(expectedEvent)
 
         val request = post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -65,8 +78,7 @@ class FestivalControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isOk)
 
-        verify(festivalScoreCalculator).calculate(Festival(
-                listOf(Artist("The National"), Artist("The Smiths"))))
+        verify(eventService).calculate("festival name", listOf("The National", "The Smiths"))
     }
 
 }

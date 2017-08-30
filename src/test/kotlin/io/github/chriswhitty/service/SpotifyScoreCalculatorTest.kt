@@ -24,13 +24,13 @@ class SpotifyScoreCalculatorTest {
     @Test
     fun shouldRetrievePopularityFromSpotify() {
         whenever(mockSpotifyClient.searchArtist("The National")).thenReturn(Artist("The National", 90))
-        assertThat(calculator.calculate(Artist("The National")), equalTo(90))
+        assertThat(calculator.calculate("The National"), equalTo(90))
     }
 
     @Test
     fun shouldReturnNull_whenNoArtistFound() {
         whenever(mockSpotifyClient.searchArtist("FakeBand")).thenReturn(null)
-        assertThat(calculator.calculate(Artist("FakeBand")), nullValue())
+        assertThat(calculator.calculate("FakeBand"), nullValue())
     }
 }
 
