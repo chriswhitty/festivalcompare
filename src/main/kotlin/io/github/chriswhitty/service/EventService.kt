@@ -1,5 +1,6 @@
 package io.github.chriswhitty.service
 
+import io.github.chriswhitty.service.SpotifyArtistScoreCalculator.Companion.SPOTIFY_TYPE_ID
 import org.springframework.stereotype.Service
 
 
@@ -41,15 +42,13 @@ class EventServiceImpl(val artistScoreCalculator: ArtistScoreCalculator) : Event
         }
 
         val spotifyScores = artists.map {
-            it.scores.find { it.type == "Spotify" }
+            it.scores.find { it.type == SPOTIFY_TYPE_ID }
         }.filterNotNull()
 
         val average = if (spotifyScores.isEmpty()) {
             0.0
         } else {
-            spotifyScores
-                    .map { it.score }
-                    .average()
+            spotifyScores.map { it.score }.average()
         }
 
         return Event(name, average, artists)

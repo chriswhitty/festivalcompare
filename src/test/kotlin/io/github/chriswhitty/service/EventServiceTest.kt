@@ -1,5 +1,6 @@
 package io.github.chriswhitty.service
 
+import io.github.chriswhitty.service.SpotifyArtistScoreCalculator.Companion.SPOTIFY_TYPE_ID
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
 import org.junit.Assert.assertThat
@@ -21,11 +22,11 @@ class EventServiceTest {
 
         assertThat(event.artists[0].name, equalTo("The National"))
         assertThat(event.artists[0].scores[0].score, equalTo(70))
-        assertThat(event.artists[0].scores[0].type, equalTo("Spotify"))
+        assertThat(event.artists[0].scores[0].type, equalTo(SPOTIFY_TYPE_ID))
 
         assertThat(event.artists[1].name, equalTo("Nirvana"))
         assertThat(event.artists[1].scores[0].score, equalTo(50))
-        assertThat(event.artists[1].scores[0].type, equalTo("Spotify"))
+        assertThat(event.artists[1].scores[0].type, equalTo(SPOTIFY_TYPE_ID))
     }
 
     @Test
@@ -67,7 +68,7 @@ class EventServiceTest {
     }
 
     class BandScores(val scores: Map<String, Int>) : ArtistScoreCalculator {
-        override val type = "Spotify"
+        override val type = SPOTIFY_TYPE_ID
 
         override fun calculate(artistName: String): Int? {
             return scores[artistName]

@@ -3,6 +3,7 @@ package io.github.chriswhitty.service
 import com.nhaarman.mockito_kotlin.any
 import io.github.chriswhitty.client.SpotifyClient
 import io.github.chriswhitty.controller.FestivalController
+import io.github.chriswhitty.service.SpotifyArtistScoreCalculator.Companion.SPOTIFY_TYPE_ID
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
@@ -37,10 +38,10 @@ class FestivalControllerTest {
                 listOf("The National", "The Smiths", "Missing Band")))
                 .thenReturn(Event("festival name", 88.0, listOf(
                         Artist("The National", listOf(
-                                Score("Spotify", 90)
+                                Score(SPOTIFY_TYPE_ID, 90)
                         )),
                         Artist("The Smiths", listOf(
-                                Score("Spotify", 80)
+                                Score(SPOTIFY_TYPE_ID, 80)
                         )),
                         Artist("Missing Band", listOf())
                 )))
@@ -61,10 +62,10 @@ class FestivalControllerTest {
 
         val expectedEvent = Event("festival name", 85.0, listOf(
                 Artist("The National", listOf(
-                        Score("Spotify", 90)
+                        Score(SPOTIFY_TYPE_ID, 90)
                 )),
                 Artist("The Smiths", listOf(
-                        Score("Spotify", 80)
+                        Score(SPOTIFY_TYPE_ID, 80)
                 ))))
 
         `when`(eventService.calculate(any(), any()))

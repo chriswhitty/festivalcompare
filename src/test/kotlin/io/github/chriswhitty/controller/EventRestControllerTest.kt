@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.github.chriswhitty.client.SpotifyClient
 import io.github.chriswhitty.controller.EventRestController
 import io.github.chriswhitty.controller.NewEvent
+import io.github.chriswhitty.service.SpotifyArtistScoreCalculator.Companion.SPOTIFY_TYPE_ID
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,10 +43,10 @@ class EventRestControllerTest {
                 listOf("The National", "The Smiths", "Missing Band")))
                 .thenReturn(Event("festival name", 85.0, listOf(
                         Artist("The National", listOf(
-                                Score("Spotify", 90)
+                                Score(SPOTIFY_TYPE_ID, 90)
                         )),
                         Artist("The Smiths", listOf(
-                                Score("Spotify", 80)
+                                Score(SPOTIFY_TYPE_ID, 80)
                         )),
                         Artist("Missing Band", listOf())
                 )))
@@ -59,10 +60,10 @@ class EventRestControllerTest {
                 .andExpect(jsonPath("$.eventName", equalTo("festival name")))
                 .andExpect(jsonPath("$.eventScore", equalTo(85.0)))
                 .andExpect(jsonPath("$.artists[0].name", equalTo("The National")))
-                .andExpect(jsonPath("$.artists[0].scores[0].type", equalTo("Spotify")))
+                .andExpect(jsonPath("$.artists[0].scores[0].type", equalTo(SPOTIFY_TYPE_ID)))
                 .andExpect(jsonPath("$.artists[0].scores[0].score", equalTo(90)))
                 .andExpect(jsonPath("$.artists[1].name", equalTo("The Smiths")))
-                .andExpect(jsonPath("$.artists[1].scores[0].type", equalTo("Spotify")))
+                .andExpect(jsonPath("$.artists[1].scores[0].type", equalTo(SPOTIFY_TYPE_ID)))
                 .andExpect(jsonPath("$.artists[1].scores[0].score", equalTo(80)))
                 .andExpect(jsonPath("$.artists[2].name", equalTo("Missing Band")))
     }

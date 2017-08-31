@@ -12,13 +12,17 @@ interface ArtistScoreCalculator {
 @Service
 class SpotifyArtistScoreCalculator(val spotifyClient: SpotifyClient) : ArtistScoreCalculator {
 
-    override val type = "Spotify"
+    override val type = SPOTIFY_TYPE_ID
 
     override fun calculate(name: String): Int? {
         val artist = spotifyClient.searchArtist(name)
 
         artist ?: return null
         return artist.popularity
+    }
+
+    companion object {
+        val SPOTIFY_TYPE_ID = "Spotify"
     }
 
 }
