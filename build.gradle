@@ -1,45 +1,27 @@
 buildscript {
-	ext {
-		kotlinVersion = '1.1.3'
-		springBootVersion = '1.4.3.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion"
-	}
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:gradle-processes:0.3.0'
+    }
 }
 
-apply plugin: 'kotlin'
-apply plugin: "kotlin-spring"
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
+apply plugin: 'com.github.johnrengelman.processes'
+apply from: "$rootDir/util.gradle"
 
-jar {
-	baseName = 'festivalcompare'
-	version = '0.0.1-SNAPSHOT'
-}
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+allprojects {
+  group = 'io.github.chriswhitty'
 
-repositories {
-	mavenCentral()
+  defaultTasks 'build', 'e2e'
 }
 
-
-dependencies {
-	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
-    compile 'com.squareup.okhttp3:okhttp:3.5.0'
-    compile 'commons-io:commons-io:2.5'
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.4"
-	runtime('com.h2database:h2')
-	runtime('org.postgresql:postgresql')
-    testCompile "com.github.tomakehurst:wiremock-standalone:2.4.1"
-	testCompile 'org.springframework.boot:spring-boot-starter-test'
-    testCompile "com.nhaarman:mockito-kotlin:1.0.1"
+task startServer() {
+    doLast {
+        Process serverProcess = startProcess([SPRING_PROFILES: "e2e"], "/bin/bash", "gradlew", "bootRun", "-Dspring.profiles.active=e2e")
+        waitForServer("localhost", 8080)
+        Process.addShutdownHook {serverProcess.destroy()}
+    }
 }
+
+task e2e(dependsOn: ['startServer', 'frontend:run_e2e'])

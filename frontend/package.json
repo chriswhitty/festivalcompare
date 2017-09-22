@@ -1,0 +1,45 @@
+{
+  "name": "festivalcompare",
+  "version": "1.0.0",
+  "description": "Project to calculate popularity of festival lineups",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chriswhitty/festivalcompare.git"
+  },
+  "author": "Chris Whitty",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chriswhitty/festivalcompare/issues"
+  },
+  "homepage": "https://github.com/chriswhitty/festivalcompare#readme",
+  "dependencies": {
+    "express-http-proxy": "^1.0.6",
+    "gulp-mocha": "^4.3.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "whatwg-fetch": "^2.0.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "chai": "^4.1.2",
+    "enzyme": "^2.9.1",
+    "express": "^4.15.4",
+    "gulp": "^3.9.1",
+    "jsdom": "^11.2.0",
+    "mocha": "^3.5.0",
+    "react-test-renderer": "^15.6.1",
+    "selenium-webdriver": "^3.5.0",
+    "webpack": "^3.5.5",
+    "webpack-dev-middleware": "^1.12.0",
+    "webpack-stream": "^4.0.0"
+  }
+}

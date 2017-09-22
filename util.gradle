@@ -1,0 +1,34 @@
+ext.startProcess = { Map<String, String> env, String... commands ->
+
+    File logFile = new File("$buildDir/logs/${System.currentTimeMillis()}.log");
+    logFile.parentFile.mkdirs();
+
+    ProcessBuilder pb = new ProcessBuilder(commands);
+    pb.environment().putAll(env)
+    pb.redirectOutput(ProcessBuilder.Redirect.to(logFile))
+    pb.redirectError(ProcessBuilder.Redirect.to(logFile));
+    return pb.start();
+}
+
+Closure serverIsUp = { String host, int port ->
+    try {
+        Socket s = new Socket(host, port)
+        s.close()
+        return true;
+    } catch (IOException ignored) {
+        return false;
+    }
+}
+
+Closure waitUntil = { finished ->
+    int count = 0
+    while (!finished()) {
+        if(count++ == 30) throw new Exception("Timed out waiting for server to start")
+        Thread.sleep(1000);
+    }
+}
+
+ext.waitForServer = { String host, int port ->
+    println("Waiting for server to start")
+    waitUntil { serverIsUp(host, port) }
+}

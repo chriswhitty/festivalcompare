@@ -1,0 +1,27 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+  }
+}
+
+apply plugin: "com.moowork.gulp"
+
+gulp_build.dependsOn 'npmInstall'
+gulp_build.dependsOn 'installGulp'
+
+
+task clean() {
+    delete "${buildDir}/"
+}
+
+task run_e2e(dependsOn: 'gulp_run_e2e')
+
+task build(type: Copy, dependsOn: 'gulp_build') {
+    from "$buildDir/gulp/"
+    into "$buildDir/web/"
+}
